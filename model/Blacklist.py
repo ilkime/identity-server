@@ -1,0 +1,3 @@
+class Blacklist():
+    _blacklist = []
+    

@@ -1,0 +1,3 @@
+class Users():
+    _users = []
+    

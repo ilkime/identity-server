@@ -1,2 +1,2 @@
-openapi
-pyjwt
+fastapi[all]
+pyjwt[crypto]
