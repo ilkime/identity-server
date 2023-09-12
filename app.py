@@ -9,6 +9,7 @@ from model.Blacklist import Blacklist
 from helper.jwt_helper import generate_jwt_token, decode_jwt_token, validate_jwt_token, public_pem
 from datetime import datetime
 
+
 app = FastAPI()
 
 users = Users._users
@@ -38,18 +39,17 @@ async def logout(token = Header(None)):
 @app.post("/api/v1/auth/register")
 async def register(user: User):
     users.append(user)
-    return JSONResponse(content=user.model_dump(), status_code=201)
+    return JSONResponse(content=user.dict(), status_code=201)
 
 @app.get("/api/v1/auth/validate")
 async def validate(token = Header(None), role: Optional[list] = []):
-    
-    if token not in blacklist and validate_jwt_token(token)[0]:
+    is_valid_token, token_error = validate_jwt_token(token)
+
+    if token not in blacklist and is_valid_token:
         decoded_token = decode_jwt_token(token)
-        if not role:
+        if not role or role in decoded_token:
             return JSONResponse(content="Valid token", status_code=200)
-        elif role in decoded_token:
-            return JSONResponse(content="Valid token", status_code=200)
-    return JSONResponse(content="Invalid token", status_code=401)
+    return JSONResponse(content=f"Invalid token, {token_error}", status_code=401)
 
 @app.get("/api/v1/auth/keys")
 async def getKeys():
